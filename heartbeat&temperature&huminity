@@ -49,6 +49,12 @@ heartbeatDetected(int IRSensorPin, int delay)
   return result;
 }
 
+
+/////LCD 모듈/////
+
+#include <LiquidCrystal_I2C.h>  //LiquidCrystalI2C 헤더파일 호출
+LiquidCrystal_I2C lcd(0x27,16,2);  //LCD의 address 주소 및 크기 입력
+
 /////온습도센서/////
 
 #include <Wire.h>
@@ -96,6 +102,11 @@ void setup()
 
   pinMode(HUMI_Sensor,OUTPUT); //센서 핀 출력 설정
   digitalWrite(HUMI_Sensor, HIGH); // 센서값 HIGH
+
+  ///LCD모듈///
+  lcd.init();  //lcd 초기화 함수
+  lcd.backlight(); //lcd 백라이트 함수
+  
 }
 
 const int delayMsec = 60; // 100msec per sample
@@ -136,19 +147,29 @@ void loop()
     Serial.println('C'); // 모니터에 C 출력
     
     beatMsec = 0;
+    
+    
+    if (heartRateBPM > 300)
+      {
+       digitalWrite(LED_R, HIGH);
+       digitalWrite(LED_G, LOW);
+       delay(1000); 
+       }
+    else{
+    digitalWrite(LED_R, LOW);
+    digitalWrite(LED_G, HIGH);
+      }
+
   }
-  
+
+  ///lcd 모듈///
+  lcd.setCursor(0,0); //커서 첫번째칸 첫번째줄 위치
+  lcd.print("BPM,TEMP,HUMI");
+
+      
   delay(delayMsec);
   beatMsec += delayMsec;
 
-  if (heartRateBPM > 140)
-  {digitalWrite(LED_R, HIGH);
-   digitalWrite(LED_G, LOW);
-  delay(1000);
-  }
-  else
-  digitalWrite(LED_R, LOW);
-  digitalWrite(LED_G, HIGH);
 
 
 }
